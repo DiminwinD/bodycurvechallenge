@@ -327,3 +327,46 @@ Max 500 mots. Tout ce qui peut être quantifié l'est.
 ## Référence agents complets
 Tous les prompts complets et exemples d'utilisation sont dans :
 `c:/Users/yaogd/OneDrive/Bureau/COWORK/sandbox/MES_AGENTS.md`
+
+---
+
+## Conventions Projet — Vite SPA + Vercel
+
+### Stack technique
+- Framework : React + Vite (Single Page Application)
+- Déploiement : Vercel
+- Routing : React Router DOM (client-side)
+
+### Règle critique — Routing Vercel
+Vite génère un seul fichier `index.html`. Vercel doit rediriger toutes les routes vers ce fichier, sinon → 404 NOT_FOUND.
+
+**Fichier obligatoire** : `vercel.json` à la racine du Root Directory Vercel (ici `frontend/landing/`) :
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
+
+### Checklist avant chaque déploiement Vercel
+- `vercel.json` présent avec la règle de rewrite
+- `vite.config.js` : `base: '/'`
+- Toutes les routes déclarées dans `<BrowserRouter>` via React Router
+- Build local testé : `npm run build && npm run preview`
+
+### Règles de navigation
+- Toujours utiliser **React Router DOM** pour la navigation interne (pas `<a href>`)
+- Pour les redirections externes (ex: paiement Chariow), utiliser `ExternalRedirect` avec `window.location.href`
+- Route catch-all `path="*"` toujours présente → redirige vers `<BodyCurveLanding />`
+
+### Erreurs fréquentes
+| Erreur | Cause | Solution |
+|--------|-------|----------|
+| `404 NOT_FOUND` sur une route | Pas de `vercel.json` | Ajouter le rewrite SPA |
+| Page blanche après build | Mauvais `base` dans `vite.config.js` | Mettre `base: '/'` |
+| Route fonctionne en local mais pas en prod | React Router sans rewrite Vercel | Ajouter `vercel.json` |
+
+### Déploiement Supabase Edge Functions
+```bash
+cd "C:\Users\yaogd"
+npx supabase functions deploy capture-lead --project-ref vqxlqttwomvgyxqbglzz
+```

@@ -1,15 +1,16 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import BodyCurveLanding from './BodyCurveLanding.jsx';
-import Reservation from './Reservation.jsx';
-import Success from './Success.jsx';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import BodyCurveLanding from "./BodyCurveLanding";
+import Reservation from "./Reservation";
+import Success from "./features/success/Success";
 
-const path = window.location.pathname;
-const App =
-  path === '/reservation' ? Reservation :
-  path === '/success'     ? Success :
-  BodyCurveLanding;
-
-const container = document.getElementById('root');
-const root = createRoot(container);
-root.render(<App />);
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<BodyCurveLanding />} />
+        <Route path="/reservation" element={<Reservation />} />
+        <Route path="/success" element={<Success />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

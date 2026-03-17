@@ -234,7 +234,7 @@ function CommitmentStep({ onCommit }) {
         <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: C.dark }}>Tu as fait le premier pas.</h3>
         <p style={{ color: C.muted, marginTop: 8, fontSize: 15 }}>C'est le moment de transformer cette intention en action.</p>
         <div style={{ marginTop: 20 }}>
-          <CTAButton onClick={() => { const el = document.getElementById('earlybird'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }} full>Je bloque ma place maintenant</CTAButton>
+          <CTAButton onClick={() => { window.open('https://pzptvmid.mychariow.shop/prd_iuoyld', '_blank') }} full>Je bloque ma place maintenant</CTAButton>
         </div>
       </div>
     );
@@ -482,7 +482,7 @@ function ExitIntentPopup() {
 
 // ─── PRICING CARD ─────────────────────────────────────────
 function PricingCard({ promo }) {
-  const scrollCTA = () => { const el = document.getElementById('earlybird'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } };
+  const scrollCTA = () => { window.open('https://pzptvmid.mychariow.shop/prd_iuoyld', '_blank') };
   const includes = [
     "Programme d'entraînement complet 21 jours",
     "Guide nutritionnel personnalisé",
@@ -540,7 +540,7 @@ function WhatsAppButton() {
 
 // ─── STICKY MOBILE CTA ────────────────────────────────────
 function CTAStickyMobile({ promo }) {
-  const scrollCTA = () => { const el = document.getElementById('earlybird'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } };
+  const scrollCTA = () => { window.open('https://pzptvmid.mychariow.shop/prd_iuoyld', '_blank') };
   const timer = promo.active ? `${String(promo.hours).padStart(2, "0")}:${String(promo.minutes).padStart(2, "0")}:${String(promo.seconds).padStart(2, "0")}` : null;
   return (
     <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 850, background: C.card, padding: "10px 16px", boxShadow: "0 -4px 20px rgba(0,0,0,.08)", display: "flex", alignItems: "center", gap: 12 }}>
@@ -576,7 +576,7 @@ export default function BodyCurveChallenge() {
   const [quizDone, setQuizDone] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState(null);
 
-  const scrollPricing = () => { const el = document.getElementById('earlybird'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } };
+  const scrollPricing = () => { window.open('https://pzptvmid.mychariow.shop/prd_iuoyld', '_blank') };
 
   return (
     <div style={{ fontFamily: "'Inter', 'Manrope', -apple-system, sans-serif", color: C.text, background: C.bg, overflowX: "hidden", paddingBottom: 70 }}>

@@ -1,0 +1,1 @@
+VITE_CAPTURE_LEAD_URL=https://vqxlqttwomvgyxqbglzz.supabase.co/functions/v1/capture-lead

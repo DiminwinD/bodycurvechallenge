@@ -12,7 +12,7 @@ const CONFIG = {
   WHATSAPP_NUMBER: "+2250799576214",
   SPOTS_TOTAL: 120,
   SPOTS_LEFT: 43,
-  AI_WIDGET_ENABLED: false,
+  AI_WIDGET_ENABLED: true,
   PAYMENT_URL: "https://pzptvmid.mychariow.shop/prd_iuoyld",
 };
 
@@ -301,7 +301,7 @@ function FAQAccordion() {
 
 // ─── EARLY BIRD SIGNUP (avec Supabase) ───────────────────
 function EarlyBirdSignup() {
-  const [form, setForm] = useState({ prenom: "", whatsapp: "" });
+  const [form, setForm] = useState({ prenom: "", whatsapp: "", email: "" });
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -309,7 +309,7 @@ function EarlyBirdSignup() {
     if (!form.prenom || !form.whatsapp) return;
     setLoading(true);
     try {
-      await supabase.from("leads").insert([{ prenom: form.prenom, whatsapp: form.whatsapp, source: "earlybird" }]);
+      await supabase.from("leads").insert([{ prenom: form.prenom, whatsapp: form.whatsapp, email: form.email || null, source: "earlybird" }]);
     } catch (e) { console.error(e); }
     setLoading(false);
     setDone(true);
@@ -334,6 +334,7 @@ function EarlyBirdSignup() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <input placeholder="Prénom *" value={form.prenom} onChange={(e) => setForm({ ...form, prenom: e.target.value })} style={inp} />
             <input placeholder="WhatsApp *" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} style={inp} />
+            <input placeholder="Email (optionnel)" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={inp} />
             <CTAButton onClick={submit} full>{loading ? "Envoi..." : "Recevoir mon guide"}</CTAButton>
             <Micro>Aucun spam. Tes infos restent privées.</Micro>
           </div>
@@ -438,7 +439,7 @@ function ExitIntentPopup() {
   const [show, setShow] = useState(false);
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ prenom: "", whatsapp: "" });
+  const [form, setForm] = useState({ prenom: "", whatsapp: "", email: "" });
   const shown = useRef(false);
   useExitIntent(() => { if (!shown.current) { shown.current = true; setShow(true); } });
 
@@ -446,7 +447,7 @@ function ExitIntentPopup() {
     if (!form.prenom || !form.whatsapp) return;
     setLoading(true);
     try {
-      await supabase.from("leads").insert([{ prenom: form.prenom, whatsapp: form.whatsapp, source: "exit_intent" }]);
+      await supabase.from("leads").insert([{ prenom: form.prenom, whatsapp: form.whatsapp, email: form.email || null, source: "exit_intent" }]);
     } catch (e) { console.error(e); }
     setLoading(false);
     setDone(true);
@@ -476,6 +477,7 @@ function ExitIntentPopup() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <input placeholder="Prénom *" value={form.prenom} onChange={(e) => setForm({ ...form, prenom: e.target.value })} style={inp} />
               <input placeholder="WhatsApp *" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} style={inp} />
+              <input placeholder="Email (optionnel)" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={inp} />
               <CTAButton onClick={submit} full>{loading ? "Envoi..." : "Recevoir mon guide"}</CTAButton>
               <Micro>Aucun spam. Tes infos restent privées.</Micro>
             </div>
@@ -625,14 +627,9 @@ export default function BodyCurveLanding() {
       <SectionWrap bg={C.card}>
         <Heading center sub="+300 femmes ont déjà rejoint Body Curve Challenge.">Elles témoignent</Heading>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {[
-            ["Koné A.", "Je n'y croyais plus après deux tentatives ratées. Marie m'a prouvé le contraire en trois semaines."],
-            ["Aminata D.", "Le groupe WhatsApp m'a donné l'énergie que je n'avais plus. On se motive entre nous, c'est incroyable."],
-            ["Fatou B.", "Les séances sont courtes mais tellement efficaces. J'ai vu des résultats dès la deuxième semaine."],
-          ].map(([name, text]) => (
-            <div key={name} style={{ background: `${C.peach}08`, borderRadius: 20, padding: 24, borderLeft: `3px solid ${C.cta}` }}>
-              <p style={{ color: C.text, fontSize: 15, lineHeight: 1.7, fontStyle: "italic", marginBottom: 8 }}>« {text} »</p>
-              <p style={{ color: C.cta, fontWeight: 600, fontSize: 14 }}>— {name}</p>
+          {["/capture-whatsapp-1.jpeg", "/capture-whatsapp-2.jpeg", "/capture-whatsapp-3.jpeg"].map((src, i) => (
+            <div key={i} style={{ borderRadius: 20, overflow: "hidden", boxShadow: `0 4px 20px ${C.border}` }}>
+              <img src={src} alt={`Témoignage WhatsApp ${i + 1}`} style={{ width: "100%", display: "block", borderRadius: 20 }} />
             </div>
           ))}
         </div>

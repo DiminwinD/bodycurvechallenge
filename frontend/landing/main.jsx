@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import BodyCurveLanding from "./BodyCurveLanding";
-import Success from "./features/success/Success";
+import Success from "./Success.jsx";
 
 function ExternalRedirect({ to }) {
   useEffect(() => {

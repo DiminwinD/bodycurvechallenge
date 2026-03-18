@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -r \"template\\\\|Template\\\\|TEMPLATE\\\\|sender\\\\|Sender\\\\|SENDER\\\\|from\\\\|From\\\\|FROM\" 'C:\\\\Users\\\\yaogd\\\\OneDrive\\\\Bureau\\\\COWORK\\\\sandbox\\\\BodyCurveApp\\\\frontend\\\\landing' --include=\"*.ts\" --include=\"*.tsx\" --include=\"*.js\" --include=\"*.jsx\" 2>/dev/null | grep -i \"brevo\\\\|email\\\\|send\" | head -20)"
+      "Bash(grep -r \"template\\\\|Template\\\\|TEMPLATE\\\\|sender\\\\|Sender\\\\|SENDER\\\\|from\\\\|From\\\\|FROM\" 'C:\\\\Users\\\\yaogd\\\\OneDrive\\\\Bureau\\\\COWORK\\\\sandbox\\\\BodyCurveApp\\\\frontend\\\\landing' --include=\"*.ts\" --include=\"*.tsx\" --include=\"*.js\" --include=\"*.jsx\" 2>/dev/null | grep -i \"brevo\\\\|email\\\\|send\" | head -20)",
+      "Bash(npm run:*)"
     ]
   }
 }

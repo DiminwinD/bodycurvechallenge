@@ -8,7 +8,7 @@ const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env
 const CONFIG = {
   TIMEZONE: "Africa/Abidjan",
   PROMO_DEADLINE_ISO: "2026-03-30T23:59:00",
-  PRICES: { original: 125000, promo: 25000, standard: 60000 },
+  PRICES: { original: 125000, promo: 25000, standard: 35000 },
   WHATSAPP_NUMBER: "+2250799576214",
   SPOTS_TOTAL: 120,
   SPOTS_LEFT: 43,

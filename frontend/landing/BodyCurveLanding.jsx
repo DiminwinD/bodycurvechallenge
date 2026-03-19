@@ -21,8 +21,9 @@ const handlePayment = () => window.open(CONFIG.PAYMENT_URL, "_blank", "noopener,
 
 const formatFCFA = (n) => n.toLocaleString("fr-FR") + " FCFA";
 
-const IMG_MIRROR = "/img-mirror.png";
-const IMG_APRES = "/img-apres.png";
+const IMG_MIRROR = "/img-mirror-original.png";
+const IMG_AVANT = "/img-apres.png";
+const IMG_APRES = "/img-avant.png";
 
 // ─── HOOKS ────────────────────────────────────────────────
 function usePromoState() {
@@ -257,7 +258,7 @@ function BeforeAfterSlider() {
       style={{ position: "relative", borderRadius: 20, overflow: "hidden", height: 320, cursor: "col-resize", userSelect: "none" }}
       onMouseDown={(e) => { dragging.current = true; move(e.clientX); }}
       onTouchStart={(e) => { dragging.current = true; move(e.touches[0].clientX); }}>
-      <ImgPlaceholder label="AVANT" h={320} src={IMG_MIRROR} style={{ borderRadius: 0, position: "absolute", inset: 0 }} />
+      <ImgPlaceholder label="AVANT" h={320} src={IMG_AVANT} style={{ borderRadius: 0, position: "absolute", inset: 0 }} />
       <div style={{ position: "absolute", inset: 0, clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
         <ImgPlaceholder label="APRÈS" h={320} src={IMG_APRES} style={{ borderRadius: 0 }} />
       </div>

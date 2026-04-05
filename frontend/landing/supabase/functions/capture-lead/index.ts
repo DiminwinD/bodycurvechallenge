@@ -49,6 +49,39 @@ const UX_MESSAGES: Record<string, string> = {
   db_error:                       "Une erreur est survenue côté serveur. Veuillez réessayer.",
 };
 
+// ── HTML inline fallback ───────────────────────────────────────────────────────
+
+function buildFallbackHtml(prenom: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;padding:0;">
+  <div style="background:linear-gradient(135deg,#C19A6B,#8B6914);padding:40px 30px;text-align:center;">
+    <h1 style="color:#fff;margin:0;font-size:28px;">BodyCurve Challenge 🌟</h1>
+    <p style="color:#ffe;margin:10px 0 0;font-size:16px;">Ta transformation commence aujourd'hui</p>
+  </div>
+  <div style="padding:35px 30px;">
+    <h2 style="color:#333;">Bienvenue ${prenom} ! ✨</h2>
+    <p style="color:#555;line-height:1.7;">Tu viens de rejoindre une communauté de femmes qui prennent soin d'elles et transforment leur corps avec méthode et bienveillance.</p>
+    <p style="color:#555;line-height:1.7;"><strong>Chaque semaine, tu recevras :</strong></p>
+    <ul style="color:#555;line-height:2;">
+      <li>🏃‍♀️ Des conseils sport adaptés</li>
+      <li>🥗 Des conseils alimentation sains et gourmands</li>
+      <li>💆‍♀️ Des rituels bien-être</li>
+      <li>✨ De la motivation pour tenir sur la durée</li>
+    </ul>
+    <div style="background:#FFF8EE;border-left:4px solid #C19A6B;padding:20px;margin:25px 0;border-radius:0 8px 8px 0;">
+      <p style="margin:0;color:#8B6914;font-style:italic;font-size:16px;">"La transformation ne commence pas dans la salle de sport. Elle commence dans ta tête." 💪</p>
+    </div>
+    <p style="color:#555;">Prête ? <strong>Ta meilleure version t'attend.</strong></p>
+  </div>
+  <div style="background:#f5f5f5;padding:20px;text-align:center;">
+    <p style="color:#999;font-size:12px;margin:0;">BodyCurve Challenge — Pour les femmes qui veulent plus 🌿</p>
+  </div>
+</body>
+</html>`;
+}
+
 // ── Handler ───────────────────────────────────────────────────────────────────
 
 // deno-lint-ignore no-explicit-any
@@ -80,7 +113,7 @@ serve(async (req: Request): Promise<Response> => {
     const brevoApiKey            = Deno.env.get("BREVO_API_KEY");
     const brevoListId            = Deno.env.get("BREVO_LIST_ID");
     const brevoTemplateId        = Deno.env.get("BREVO_TEMPLATE_ID");
-    const brevoSenderEmail       = Deno.env.get("BREVO_SENDER_EMAIL");
+    const brevoSenderEmail       = Deno.env.get("BREVO_SENDER_EMAIL") ?? "noreply@bodycurve.fr";
     const brevoSenderName        = Deno.env.get("BREVO_SENDER_NAME") ?? "BodyCurve Challenge";
 
     if (!supabaseUrl || !supabaseServiceRoleKey) {
@@ -145,14 +178,15 @@ serve(async (req: Request): Promise<Response> => {
       }
 
       // 2) Envoyer l'email transactionnel — uniquement si email réel disponible
-      if (emailNorm && (brevoTemplateId || brevoSenderEmail)) {
-        let emailSent = false;
+      if (emailNorm) {
+        const prenom      = firstName ?? "toi";
+        const toRecipient = [{ email: emailNorm, name: prenom }];
+        let emailSent     = false;
+        let lastEmailError: string | null = null;
 
-        const toRecipient = [{ email: emailNorm, name: firstName ?? "" }];
-        let smtpPayload: Record<string, unknown>;
-
+        // Tentative 1 : via template Brevo si BREVO_TEMPLATE_ID est défini
         if (brevoTemplateId) {
-          smtpPayload = {
+          const smtpPayload = {
             to:         toRecipient,
             templateId: Number(brevoTemplateId),
             params: {
@@ -160,32 +194,42 @@ serve(async (req: Request): Promise<Response> => {
               WHATSAPP: phoneRaw  ?? "",
             },
           };
+          const smtpRes = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method:  "POST",
+            headers: { "Content-Type": "application/json", "api-key": brevoApiKey },
+            body:    JSON.stringify(smtpPayload),
+          });
+          if (smtpRes.ok) {
+            emailSent = true;
+            console.log("[capture-lead] Email template envoyé à:", emailNorm);
+          } else {
+            lastEmailError = await smtpRes.text();
+            console.error("[capture-lead] Échec template Brevo:", smtpRes.status, lastEmailError, "→ fallback HTML inline");
+          }
         } else {
-          smtpPayload = {
-            sender:      { name: brevoSenderName, email: brevoSenderEmail },
-            to:          toRecipient,
-            subject:     `${firstName ?? "Bonjour"}, ton guide BodyCurve est prêt 🎁`,
-            htmlContent: `
-              <p>Bonjour ${firstName ?? ""},</p>
-              <p>Merci pour ton inscription au <strong>BodyCurve Challenge</strong> !</p>
-              <p>Tu vas recevoir ton guide ventre plat sur WhatsApp très prochainement.</p>
-              <p>À très vite,<br>L'équipe BodyCurve</p>
-            `,
-          };
+          console.log("[capture-lead] BREVO_TEMPLATE_ID absent → fallback HTML inline direct");
         }
 
-        const smtpRes = await fetch("https://api.brevo.com/v3/smtp/email", {
-          method:  "POST",
-          headers: { "Content-Type": "application/json", "api-key": brevoApiKey },
-          body:    JSON.stringify(smtpPayload),
-        });
-
-        if (smtpRes.ok) {
-          emailSent = true;
-          console.log("[capture-lead] Email transactionnel envoyé à:", emailNorm);
-        } else {
-          const smtpErr = await smtpRes.text();
-          console.error("[capture-lead] Échec envoi email transactionnel:", smtpRes.status, smtpErr);
+        // Tentative 2 : fallback HTML inline si template absent OU si template a échoué
+        if (!emailSent) {
+          const smtpPayload = {
+            sender:      { name: brevoSenderName, email: brevoSenderEmail },
+            to:          toRecipient,
+            subject:     `Bienvenue dans le BodyCurve Challenge, ${prenom} !`,
+            htmlContent: buildFallbackHtml(prenom),
+          };
+          const smtpRes = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method:  "POST",
+            headers: { "Content-Type": "application/json", "api-key": brevoApiKey },
+            body:    JSON.stringify(smtpPayload),
+          });
+          if (smtpRes.ok) {
+            emailSent = true;
+            console.log("[capture-lead] Email HTML inline envoyé à:", emailNorm);
+          } else {
+            lastEmailError = await smtpRes.text();
+            console.error("[capture-lead] Échec email HTML inline Brevo:", smtpRes.status, lastEmailError);
+          }
         }
 
         // 3) Mettre à jour email_sent dans la table leads
@@ -201,10 +245,13 @@ serve(async (req: Request): Promise<Response> => {
             console.log("[capture-lead] email_sent = true pour lead:", result.lead_id);
           }
         }
-      } else if (!emailNorm) {
-        console.log("[capture-lead] Pas d'email réel — envoi email transactionnel ignoré.");
+
+        if (!emailSent) {
+          console.error("[capture-lead] TOUS les essais d'envoi email ont échoué. Dernière erreur Brevo:", lastEmailError);
+        }
+
       } else {
-        console.warn("[capture-lead] BREVO_TEMPLATE_ID et BREVO_SENDER_EMAIL manquants — envoi email ignoré.");
+        console.log("[capture-lead] Pas d'email réel — envoi email transactionnel ignoré.");
       }
     }
 
